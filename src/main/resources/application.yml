@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: pix-wallet-service
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/pixwallet}
+    username: ${DATABASE_USERNAME:pixwallet}
+    password: ${DATABASE_PASSWORD:pixwallet123}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: false
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.finaya.pixwallet: INFO
+    org.springframework.transaction: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/pix-wallet-service.log
+
+pixwallet:
+  transfer:
+    max-retry-attempts: 3
+    retry-delay-ms: 100
+  idempotency:
+    default-ttl-hours: 24
+  webhook:
+    processing-timeout-ms: 5000
